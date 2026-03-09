@@ -1,8 +1,8 @@
 #include <iostream>
-#include <tabulate/table.hpp>
+#include <iomanip>
+#include <string>
 
 using namespace std;
-using namespace tabulate;
 
 struct Ide{
     int id;
@@ -190,22 +190,22 @@ int main(){
                                 cout << "Belum ada data" << endl;
                             }
                             else{
+                                cout << left
+                                     << setw(6) << "ID"
+                                     << setw(25) << "Judul"
+                                     << setw(40) << "Deskripsi"
+                                     << setw(15) << "Status" << endl;
 
-                                Table tabel;
-
-                                tabel.add_row({"ID","Judul","Deskripsi","Status"});
+                                cout << string(86, '-') << endl;
 
                                 for(int i=0;i<sistem.jumlahIde;i++){
-
-                                    tabel.add_row({
-                                        to_string(sistem.daftarIde[i].id),
-                                        sistem.daftarIde[i].judul,
-                                        sistem.daftarIde[i].deskripsi,
-                                        sistem.daftarIde[i].status
-                                    });
+                                    cout << left
+                                         << setw(6) << sistem.daftarIde[i].id
+                                         << setw(25) << sistem.daftarIde[i].judul
+                                         << setw(40) << sistem.daftarIde[i].deskripsi
+                                         << setw(15) << sistem.daftarIde[i].status
+                                         << endl;
                                 }
-
-                                cout << tabel << endl;
                             }
                         }
 

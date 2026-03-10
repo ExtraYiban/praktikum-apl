@@ -29,7 +29,7 @@ int main(){
     sistem.jumlahUser = 0;
     sistem.jumlahIde = 0;
 
-    int menuAwal;
+    int pilihanAutentikasi;
 
     do{
 
@@ -40,13 +40,13 @@ int main(){
 
         cout << "Pilihan: ";
 
-        while(!(cin >> menuAwal)){
+        while(!(cin >> pilihanAutentikasi)){
             cin.clear();
             cin.ignore(1000,'\n');
             cout << "Input harus angka: ";
         }
 
-        if(menuAwal == 1){
+        if(pilihanAutentikasi == 1){
 
             if(sistem.jumlahUser >= 50){
                 cout << "User sudah penuh" << endl;
@@ -65,7 +65,7 @@ int main(){
             }
         }
 
-        else if(menuAwal == 2){
+        else if(pilihanAutentikasi == 2){
 
             if(sistem.jumlahUser == 0){
                 cout << "Belum ada user, silakan register dulu" << endl;
@@ -113,7 +113,7 @@ int main(){
                     do{
 
                         cout << endl;
-                        cout << "===== MENU CRUD =====" << endl;
+                        cout << "===== MENU Manajemen Ide =====" << endl;
                         cout << "1 Tambah Ide" << endl;
                         cout << "2 Lihat Ide" << endl;
                         cout << "3 Ubah Ide" << endl;
@@ -236,8 +236,38 @@ int main(){
                                     cout << "Deskripsi baru: ";
                                     getline(cin,sistem.daftarIde[i].deskripsi);
 
-                                    cout << "Status baru: ";
-                                    getline(cin,sistem.daftarIde[i].status);
+                                    int pilihanStatus;
+
+                                    cout << "Status Ide" << endl;
+                                    cout << "1 Direncanakan" << endl;
+                                    cout << "2 Ditunda" << endl;
+                                    cout << "3 Berjalan" << endl;
+                                    cout << "4 Dibatalkan" << endl;
+                                    cout << "5 Tidak Jadi" << endl;
+
+                                    while(true){
+
+                                        cout << "Pilih: ";
+                                        cin >> pilihanStatus;
+
+                                        if(cin.fail()){
+                                            cin.clear();
+                                            cin.ignore(1000,'\n');
+                                            cout << "Input harus angka" << endl;
+                                            continue;
+                                        }
+
+                                        if(pilihanStatus>=1 && pilihanStatus<=5)
+                                            break;
+
+                                        cout << "Pilihan tidak tersedia" << endl;
+                                    }
+
+                                    if(pilihanStatus==1) sistem.daftarIde[i].status="Direncanakan";
+                                    if(pilihanStatus==2) sistem.daftarIde[i].status="Ditunda";
+                                    if(pilihanStatus==3) sistem.daftarIde[i].status="Berjalan";
+                                    if(pilihanStatus==4) sistem.daftarIde[i].status="Dibatalkan";
+                                    if(pilihanStatus==5) sistem.daftarIde[i].status="Tidak Jadi";
 
                                     cout << "Data berhasil diubah" << endl;
 
@@ -289,9 +319,12 @@ int main(){
                     }while(menu != 5);
                 }
             }
+        } else {
+            if(pilihanAutentikasi != 3){
+                cout << "Pilihan tidak tersedia" << endl;
+            }
         }
-
-    }while(menuAwal != 3);
+    }while(pilihanAutentikasi != 3);
 
     cout << "Program selesai" << endl;
 

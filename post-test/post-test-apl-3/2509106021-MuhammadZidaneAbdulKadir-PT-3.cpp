@@ -23,15 +23,15 @@ struct Sistem{
     int jumlahIde;
 };
 
-void tampilkanPesan(const string &pesan){
+void tampilkanPesan(string pesan){
     cout << pesan << endl;
 }
 
-void tampilkanMenu(const string &judul){
+void tampilkanMenu(string judul){
     cout << "===== " << judul << " =====" << endl;
 }
 
-void tampilkanMenu(const string &judul, const string daftarPilihan[], int jumlahPilihan){
+void tampilkanMenu(string judul, string daftarPilihan[], int jumlahPilihan){
     tampilkanMenu(judul);
 
     for(int i = 0; i < jumlahPilihan; i++){
@@ -39,7 +39,7 @@ void tampilkanMenu(const string &judul, const string daftarPilihan[], int jumlah
     }
 }
 
-int inputAngka(const string &prompt){
+int inputAngka(string prompt){
     int nilai;
 
     cout << prompt;
@@ -98,7 +98,7 @@ void registerUser(Sistem &sistem){
     tampilkanPesan("Register berhasil");
 }
 
-bool cekLoginUser(const Sistem &sistem, const string &namaLogin, const string &nimLogin){
+bool cekLoginUser(Sistem &sistem, string namaLogin, string nimLogin){
     for(int i = 0; i < sistem.jumlahUser; i++){
         if(namaLogin == sistem.daftarUser[i].nama && nimLogin == sistem.daftarUser[i].nim){
             return true;
@@ -153,7 +153,7 @@ void tambahIde(Sistem &sistem){
     tampilkanPesan("Ide berhasil ditambahkan");
 }
 
-void lihatIde(const Sistem &sistem){
+void lihatIde(Sistem &sistem){
     if(sistem.jumlahIde == 0){
         tampilkanPesan("Belum ada data");
         return;
@@ -177,7 +177,7 @@ void lihatIde(const Sistem &sistem){
     }
 }
 
-int cariIdeById(const Sistem &sistem, int id, int indeks){
+int cariIdeById(Sistem &sistem, int id, int indeks){
     if(indeks >= sistem.jumlahIde){
         return -1;
     }
@@ -229,7 +229,7 @@ void hapusIde(Sistem &sistem){
 }
 
 void menuManajemenIde(Sistem &sistem){
-    const string menuIde[5] = {"Tambah Ide", "Lihat Ide", "Ubah Ide", "Hapus Ide", "Logout"};
+    string menuIde[5] = {"Tambah Ide", "Lihat Ide", "Ubah Ide", "Hapus Ide", "Logout"};
     int menu;
 
     do{
@@ -260,7 +260,7 @@ int main(){
     Sistem sistem;
     sistem.jumlahUser = 0;
     sistem.jumlahIde = 0;
-    const string menuAwal[3] = {"Register", "Login", "Keluar Program"};
+    string menuAwal[3] = {"Register", "Login", "Keluar Program"};
 
     int pilihanAutentikasi;
 

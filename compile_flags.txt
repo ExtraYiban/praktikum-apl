@@ -1,0 +1,2 @@
+-std=c++17
+--query-driver=C:\**\mingw64\bin\*.exe

@@ -167,17 +167,11 @@ void tampilkanDetailIde(const Ide &ide){
 /* ================= SEARCHING ================= */
 
 // Linear Search (Judul)
-void cariIdeByJudul(Sistem *sistem){
-    cin.ignore(1000, '\n');
-    string keyword;
-
-    cout << "Masukkan judul: ";
-    getline(cin, keyword);
-
+void cariIdeByJudul(Sistem *sistem, string *keyword){
     bool ditemukan = false;
 
     for(int i = 0; i < sistem->jumlahIde; i++){
-        if(sistem->daftarIde[i].judul.find(keyword) != string::npos){
+        if(sistem->daftarIde[i].judul.find(*keyword) != string::npos){
             tampilkanPesan("Ditemukan:");
             tampilkanDetailIde(sistem->daftarIde[i]);
             ditemukan = true;
@@ -189,12 +183,12 @@ void cariIdeByJudul(Sistem *sistem){
     }
 }
 
-int cariIdeById(Sistem *sistem, int id, int indeks){
+int cariIdeById(Sistem *sistem, int *id, int indeks){
     if(indeks >= (*sistem).jumlahIde){
         return -1;
     }
 
-    if((*sistem).daftarIde[indeks].id == id){
+    if((*sistem).daftarIde[indeks].id == *id){
         tampilkanPesan("Ditemukan:");
         tampilkanDetailIde((*sistem).daftarIde[indeks]);
         return indeks;
@@ -205,7 +199,7 @@ int cariIdeById(Sistem *sistem, int id, int indeks){
 
 void ubahIde(Sistem *sistem){
     int id = inputAngka("Masukkan ID: ");
-    int indeks = cariIdeById(sistem, id, 0);
+    int indeks = cariIdeById(sistem, &id, 0);
 
     if(indeks == -1){
         tampilkanPesan("ID tidak ditemukan");
@@ -281,17 +275,17 @@ void sortStatus(Sistem *sistem){
 }
 
 // Binary Search (ID)
-int binarySearchIdeById(Sistem *sistem, int target){
+int binarySearchIdeById(Sistem *sistem, int *target){
     int low = 0;
     int high = sistem->jumlahIde - 1;
 
     while(low <= high){
         int mid = (low + high) / 2;
 
-        if(sistem->daftarIde[mid].id == target){
+        if(sistem->daftarIde[mid].id == *target){
             return mid;
         }
-        else if(target < sistem->daftarIde[mid].id){
+        else if(*target < sistem->daftarIde[mid].id){
             high = mid - 1;
         }
         else{
@@ -390,7 +384,7 @@ void menuManajemenIde(Sistem *sistem){
         else if(pilih == 8){
             sortIdAscending(sistem);
             int id = inputAngka("Masukkan ID: ");
-            int idx = binarySearchIdeById(sistem, id);
+            int idx = binarySearchIdeById(sistem, &id);
 
             if(idx != -1){
                 tampilkanPesan("Ditemukan:");
@@ -401,7 +395,11 @@ void menuManajemenIde(Sistem *sistem){
         }
 
         else if(pilih == 9){
-            cariIdeByJudul(sistem);
+            cin.ignore(1000, '\n');
+            string keyword;
+            cout << "Masukkan judul: ";
+            getline(cin, keyword);
+            cariIdeByJudul(sistem, &keyword);
         }
 
         else if(pilih != 10){

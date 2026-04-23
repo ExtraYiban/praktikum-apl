@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <stdexcept>
 
 using namespace std;
 
@@ -50,11 +51,10 @@ int inputAngka(string prompt){
     cout << prompt;
     cin >> nilai;
 
-    while(cin.fail()){
+    if(cin.fail()){
         cin.clear();
         cin.ignore(1000, '\n');
-        cout << "Input harus angka: ";
-        cin >> nilai;
+        throw invalid_argument("Input harus angka!");
     }
     return nilai;
 }
@@ -80,8 +80,7 @@ string pilihStatusIde(){
 
 void registerUser(Sistem *sistem){
     if(sistem->jumlahUser >= 50){
-        tampilkanPesan("User penuh");
-        return;
+        throw length_error("User penuh");
     }
 
     cout << "Nama: ";
@@ -120,8 +119,7 @@ bool loginUser(Sistem *sistem, int percobaan){
 
 void tambahIde(Sistem *sistem){
     if(sistem->jumlahIde >= 100){
-        tampilkanPesan("Data penuh");
-        return;
+        throw length_error("Data penuh");
     }
 
     cin.ignore(1000, '\n');
@@ -140,8 +138,7 @@ void tambahIde(Sistem *sistem){
 
 void lihatIde(Sistem *sistem){
     if(sistem->jumlahIde == 0){
-        tampilkanPesan("Belum ada data");
-        return;
+        throw runtime_error("Belum ada data");
     }
 
     cout << left << setw(5) << "ID"
@@ -198,12 +195,16 @@ int cariIdeById(Sistem *sistem, int *id, int indeks){
 }
 
 void ubahIde(Sistem *sistem){
-    int id = inputAngka("Masukkan ID: ");
+    int id;
+    try {
+        id = inputAngka("Masukkan ID: ");
+    } catch(const exception &e) {
+        throw;
+    }
     int indeks = cariIdeById(sistem, &id, 0);
 
     if(indeks == -1){
-        tampilkanPesan("ID tidak ditemukan");
-        return;
+        throw runtime_error("ID tidak ditemukan");
     }
 
     cin.ignore(1000, '\n');
@@ -331,7 +332,12 @@ void tambahDummyData(Sistem *sistem){
 /* ============================================ */
 
 void hapusIde(Sistem *sistem){
-    int id = inputAngka("ID: ");
+    int id;
+    try {
+        id = inputAngka("ID: ");
+    } catch(const exception &e) {
+        throw;
+    }
 
     for(int i = 0; i < sistem->jumlahIde; i++){
         if(sistem->daftarIde[i].id == id){
@@ -343,7 +349,7 @@ void hapusIde(Sistem *sistem){
             return;
         }
     }
-    tampilkanPesan("Tidak ditemukan");
+    throw runtime_error("Tidak ditemukan");
 }
 
 void menuManajemenIde(Sistem *sistem){
@@ -365,45 +371,53 @@ void menuManajemenIde(Sistem *sistem){
     do{
         cout << endl;
         tampilkanMenu("MENU Manajemen Ide", menuIde, 10);
-        pilih = inputAngka("Pilih: ");
-
-        if(pilih == 1) tambahIde(sistem);
-        else if(pilih == 2) lihatIde(sistem);
-        else if(pilih == 3) ubahIde(sistem);
-        else if(pilih == 4) hapusIde(sistem);
-
-        else if(pilih == 5){
-            sortJudulAscending(sistem);
+        try{
+            pilih = inputAngka("Pilih: ");
         }
-        else if(pilih == 6){
-            sortIdDescending(sistem);
+        catch(const exception &e){
+            cout << "Error: " << e.what() << endl;
+            continue;
         }
-        else if(pilih == 7){
-            sortStatus(sistem);
-        }
-        else if(pilih == 8){
-            sortIdAscending(sistem);
-            int id = inputAngka("Masukkan ID: ");
-            int idx = binarySearchIdeById(sistem, &id);
 
-            if(idx != -1){
-                tampilkanPesan("Ditemukan:");
-                tampilkanDetailIde(sistem->daftarIde[idx]);
-            } else {
-                tampilkanPesan("Tidak ditemukan");
+        try{
+            if(pilih == 1) tambahIde(sistem);
+            else if(pilih == 2) lihatIde(sistem);
+            else if(pilih == 3) ubahIde(sistem);
+            else if(pilih == 4) hapusIde(sistem);
+            else if(pilih == 5){
+                sortJudulAscending(sistem);
+            }
+            else if(pilih == 6){
+                sortIdDescending(sistem);
+            }
+            else if(pilih == 7){
+                sortStatus(sistem);
+            }
+            else if(pilih == 8){
+                sortIdAscending(sistem);
+                int id = inputAngka("Masukkan ID: ");
+                int idx = binarySearchIdeById(sistem, &id);
+
+                if(idx != -1){
+                    tampilkanPesan("Ditemukan:");
+                    tampilkanDetailIde(sistem->daftarIde[idx]);
+                } else {
+                    throw runtime_error("Tidak ditemukan");
+                }
+            }
+            else if(pilih == 9){
+                cin.ignore(1000, '\n');
+                string keyword;
+                cout << "Masukkan judul: ";
+                getline(cin, keyword);
+                cariIdeByJudul(sistem, &keyword);
+            }
+            else if(pilih != 10){
+                tampilkanPesan("Pilihan tidak tersedia");
             }
         }
-
-        else if(pilih == 9){
-            cin.ignore(1000, '\n');
-            string keyword;
-            cout << "Masukkan judul: ";
-            getline(cin, keyword);
-            cariIdeByJudul(sistem, &keyword);
-        }
-
-        else if(pilih != 10){
-            tampilkanPesan("Pilihan tidak tersedia");
+        catch(const exception &e){
+            cout << "Error: " << e.what() << endl;
         }
 
     }while(pilih != 10);
@@ -422,19 +436,31 @@ int main(){
 
     do{
         tampilkanMenu("MENU AWAL", menu, 3);
-        pilih = inputAngka("Pilih: ");
-
-        if(pilih == 1){
-            registerUser(&sistem);
+        
+        try{
+            pilih = inputAngka("Pilih: ");
         }
-        else if(pilih == 2){
-            if(sistem.jumlahUser == 0){
-                tampilkanPesan("Belum ada user");
-            } else {
-                if(loginUser(&sistem, 0)){
-                    menuManajemenIde(&sistem);
+        catch(const exception &e){
+            cout << "Error: " << e.what() << endl;
+            continue;
+        }
+
+        try{
+            if(pilih == 1){
+                registerUser(&sistem);
+            }
+            else if(pilih == 2){
+                if(sistem.jumlahUser == 0){
+                    throw runtime_error("Belum ada user");
+                } else {
+                    if(loginUser(&sistem, 0)){
+                        menuManajemenIde(&sistem);
+                    }
                 }
             }
+        }
+        catch(const exception &e){
+            cout << "Error: " << e.what() << endl;
         }
 
     }while(pilih != 3);

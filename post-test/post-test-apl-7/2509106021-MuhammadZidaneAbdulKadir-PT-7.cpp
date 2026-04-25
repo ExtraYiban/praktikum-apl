@@ -1,42 +1,80 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <limits>
 #include <stdexcept>
+#ifndef NOMNMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include "model_sistem.h"
 
 using namespace std;
 
-struct Ide{
-    int id;
-    string judul;
-    string deskripsi;
-    string status;
-};
+const WORD WARNA_DEFAULT = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+HANDLE HANDLE_KONSOL = GetStdHandle(STD_OUTPUT_HANDLE);
 
-struct User{
-    string nama;
-    string nim;
-};
+void aturWarna(WORD atributWarna) {
+    SetConsoleTextAttribute(HANDLE_KONSOL, atributWarna);
+}
 
-struct Sistem{
-    User daftarUser[50];
-    Ide daftarIde[100];
-    int jumlahUser;
-    int jumlahIde;
-    int nextIdeId;
-};
+void resetWarna() {
+    aturWarna(WARNA_DEFAULT);
+}
 
-void tampilkanPesan(string pesan){
+void tampilkanJudul(const string &judul) {
+    aturWarna(FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+    cout << "\n===== " << judul << " =====" << endl;
+    resetWarna();
+}
+
+void tampilkanInfo(const string &pesan) {
+    aturWarna(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
     cout << pesan << endl;
+    resetWarna();
 }
 
-void tampilkanMenu(string judul){
-    cout << "===== " << judul << " =====" << endl;
+void tampilkanSukses(const string &pesan) {
+    aturWarna(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+    cout << "[OK] " << pesan << endl;
+    resetWarna();
 }
 
-void tampilkanMenu(string judul, string daftarPilihan[], int jumlahPilihan){
+void tampilkanPeringatan(const string &pesan) {
+    aturWarna(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+    cout << "[PERINGATAN] " << pesan << endl;
+    resetWarna();
+}
+
+void tampilkanError(const string &pesan) {
+    aturWarna(FOREGROUND_RED | FOREGROUND_INTENSITY);
+    cout << "[ERROR] " << pesan << endl;
+    resetWarna();
+}
+
+void tampilkanBanner() {
+    aturWarna(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+    cout << "==============================================" << endl;
+    cout << "  SISTEM MANAJEMEN IDE YANG TIDAK PERNAH DIEKSEKUSI  " << endl;
+    cout << "==============================================" << endl;
+    resetWarna();
+}
+
+void tampilkanPesan(const string &pesan){
+    tampilkanInfo(pesan);
+}
+
+void tampilkanMenu(const string &judul){
+    tampilkanJudul(judul);
+}
+
+void tampilkanMenu(const string &judul, string daftarPilihan[], int jumlahPilihan){
     tampilkanMenu(judul);
     for(int i = 0; i < jumlahPilihan; i++){
-        cout << i + 1 << ". " << daftarPilihan[i] << endl;
+        aturWarna(FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+        cout << i + 1 << ". ";
+        resetWarna();
+        cout << daftarPilihan[i] << endl;
     }
 }
 
@@ -46,14 +84,14 @@ void tukarIde(Ide &a, Ide &b){
     b = temp;
 }
 
-int inputAngka(string prompt){
+int inputAngka(const string &prompt){
     int nilai;
     cout << prompt;
     cin >> nilai;
 
     if(cin.fail()){
         cin.clear();
-        cin.ignore(1000, '\n');
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         throw invalid_argument("Input harus angka!");
     }
     return nilai;
@@ -109,11 +147,11 @@ bool loginUser(Sistem *sistem, int percobaan){
     cout << "NIM: "; cin >> nim;
 
     if(cekLoginUser(*sistem, nama, nim)){
-        tampilkanPesan("Login berhasil");
+        tampilkanSukses("Login berhasil");
         return true;
     }
 
-    tampilkanPesan("Login gagal");
+    tampilkanPeringatan("Login gagal");
     return loginUser(sistem, percobaan + 1);
 }
 
@@ -122,7 +160,7 @@ void tambahIde(Sistem *sistem){
         throw length_error("Data penuh");
     }
 
-    cin.ignore(1000, '\n');
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     sistem->daftarIde[sistem->jumlahIde].id = sistem->nextIdeId++;
     
@@ -161,9 +199,7 @@ void tampilkanDetailIde(const Ide &ide){
     cout << "Status: " << ide.status << endl;
 }
 
-/* ================= SEARCHING ================= */
 
-// Linear Search (Judul)
 void cariIdeByJudul(Sistem *sistem, string *keyword){
     bool ditemukan = false;
 
@@ -207,7 +243,7 @@ void ubahIde(Sistem *sistem){
         throw runtime_error("ID tidak ditemukan");
     }
 
-    cin.ignore(1000, '\n');
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     cout << "Judul baru: ";
     getline(cin, (*sistem).daftarIde[indeks].judul);
@@ -220,7 +256,6 @@ void ubahIde(Sistem *sistem){
     tampilkanPesan("Data berhasil diubah");
 }
 
-// Sorting ID ASC (untuk Binary Search)
 void sortIdAscending(Sistem *sistem){
     for(int i = 0; i < sistem->jumlahIde - 1; i++){
         for(int j = 0; j < sistem->jumlahIde - i - 1; j++){
@@ -275,7 +310,6 @@ void sortStatus(Sistem *sistem){
     lihatIde(sistem);
 }
 
-// Binary Search (ID)
 int binarySearchIdeById(Sistem *sistem, int *target){
     int low = 0;
     int high = sistem->jumlahIde - 1;
@@ -329,7 +363,6 @@ void tambahDummyData(Sistem *sistem){
     sistem->jumlahIde = 5;
 }
 
-/* ============================================ */
 
 void hapusIde(Sistem *sistem){
     int id;
@@ -375,7 +408,7 @@ void menuManajemenIde(Sistem *sistem){
             pilih = inputAngka("Pilih: ");
         }
         catch(const exception &e){
-            cout << "Error: " << e.what() << endl;
+            tampilkanError(e.what());
             continue;
         }
 
@@ -406,7 +439,7 @@ void menuManajemenIde(Sistem *sistem){
                 }
             }
             else if(pilih == 9){
-                cin.ignore(1000, '\n');
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 string keyword;
                 cout << "Masukkan judul: ";
                 getline(cin, keyword);
@@ -417,7 +450,7 @@ void menuManajemenIde(Sistem *sistem){
             }
         }
         catch(const exception &e){
-            cout << "Error: " << e.what() << endl;
+            tampilkanError(e.what());
         }
 
     }while(pilih != 10);
@@ -429,6 +462,7 @@ int main(){
     sistem.jumlahIde = 0;
     sistem.nextIdeId = 1;
 
+    tampilkanBanner();
     tambahDummyData(&sistem);
 
     string menu[] = {"Register", "Login", "Keluar"};
@@ -441,7 +475,7 @@ int main(){
             pilih = inputAngka("Pilih: ");
         }
         catch(const exception &e){
-            cout << "Error: " << e.what() << endl;
+            tampilkanError(e.what());
             continue;
         }
 
@@ -460,7 +494,7 @@ int main(){
             }
         }
         catch(const exception &e){
-            cout << "Error: " << e.what() << endl;
+            tampilkanError(e.what());
         }
 
     }while(pilih != 3);
